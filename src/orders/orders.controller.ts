@@ -30,6 +30,28 @@ export class OrdersController {
     };
   }
 
+  @Get('user/:userId')
+  @HttpCode(HttpStatus.OK)
+  async findAllByUser(@Param('userId') userId: string) {
+    const data = await this.ordersService.findAllByUser(+userId);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'User orders retrieved successfully',
+      data,
+    };
+  }
+
+  @Get('track/:identifier')
+  @HttpCode(HttpStatus.OK)
+  async trackOrder(@Param('identifier') identifier: string) {
+    const data = await this.ordersService.trackOrder(identifier);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Order tracking info retrieved successfully',
+      data,
+    };
+  }
+
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id') id: string) {

@@ -7,6 +7,7 @@ import { Order, OrderStatus } from './entities/order.entity';
 import { MailService } from '../mail/mail.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { Product } from '../products/entities/product.entity';
+import { UsersService } from '../users/users.service';
 @Injectable()
 export class OrdersService {
   constructor(
@@ -16,18 +17,34 @@ export class OrdersService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     private readonly mailService: MailService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const { items, userId, ...rest } = createOrderDto;
+    const { items, userId, customerName, customerEmail, customerPhone, ...rest } = createOrderDto;
     const orderItems = items?.map((item) => ({
       product: { id: item.productId },
       quantity: item.quantity,
     }));
 
+    let finalUserId = userId;
+
+    if (!finalUserId && customerEmail && customerName) {
+      let user = await this.usersService.findByEmail(customerEmail);
+      if (!user) {
+        user = await this.usersService.create({
+          name: customerName,
+          email: customerEmail,
+          password: Math.random().toString(36).slice(-8), // temporary random password
+          phone: customerPhone,
+        });
+      }
+      finalUserId = user.id;
+    }
+
     const order = this.orderRepository.create({
       ...rest,
-      user: { id: userId },
+      user: finalUserId ? { id: finalUserId } : undefined,
       items: orderItems,
     });
     return await this.orderRepository.save(order);
@@ -43,6 +60,52 @@ export class OrdersService {
       },
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async findAllByUser(userId: number): Promise<Order[]> {
+    return await this.orderRepository.find({
+      where: { user: { id: userId } },
+      relations: {
+        items: {
+          product: true,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async trackOrder(identifier: string): Promise<Order> {
+    // If identifier is purely numeric, it could be an ID
+    // If it starts with + or contains non-digits, it might be a phone number
+    // We will try to find by ID first, or by shippingAddress (which might contain the phone number) if we wanted to.
+    // For simplicity, we assume identifier is the Order ID for now.
+    // Support raw numeric ID or formatted ID like CG-0022
+    let idToSearch: number | null = null;
+    const cgMatch = identifier.match(/^CG-(\d+)$/i);
+    if (cgMatch) {
+      idToSearch = parseInt(cgMatch[1], 10);
+    } else if (/^\d+$/.test(identifier)) {
+      idToSearch = parseInt(identifier, 10);
+    }
+
+    let order: Order | null = null;
+    
+    if (idToSearch !== null) {
+      order = await this.orderRepository.findOne({
+        where: { id: idToSearch },
+        relations: {
+          items: {
+            product: true
+          },
+          user: true
+        },
+      });
+    }
+
+    if (!order) {
+      throw new NotFoundException(`Order not found for tracking identifier #${identifier}`);
+    }
+    return order;
   }
 
   async findOne(id: number): Promise<Order> {

@@ -11,8 +11,9 @@ class OrderItemDto {
 }
 
 export class CreateOrderDto {
+  @IsOptional()
   @IsNumber()
-  userId: number;
+  userId?: number;
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -44,4 +45,16 @@ export class CreateOrderDto {
 
   @IsNumber()
   totalAmount: number;
+
+  @IsOptional()
+  @IsString()
+  customerName?: string;
+
+  @IsOptional()
+  @IsEmail()
+  customerEmail?: string;
+
+  @IsOptional()
+  @IsString()
+  customerPhone?: string;
 }

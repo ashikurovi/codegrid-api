@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { CustomProduct } from '../../custom-products/entities/custom-product.entity';
 
 export enum CustomOrderStatus {
   NEW_REQUEST = 'New Request',
@@ -13,11 +14,25 @@ export class CustomOrder {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ManyToOne(() => CustomProduct, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'customProductId' })
+  customProduct: CustomProduct;
+
   @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'userId' })
   user: User;
 
+  @Column({ type: 'varchar', nullable: true })
+  customerName: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  customerPhone: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  customerEmail: string;
+
   @Column()
+
   category: string;
 
   @Column()
@@ -28,6 +43,9 @@ export class CustomOrder {
 
   @Column({ type: 'text', nullable: true })
   details: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  designReference: string;
 
   @Column({
     type: 'enum',
