@@ -8,11 +8,12 @@ export class MailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-      port: Number(process.env.SMTP_PORT) || 587,
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
-        user: process.env.SMTP_USER || 'test@example.com',
-        pass: process.env.SMTP_PASS || 'password',
+        user: 'codgridbd@gmail.com',
+        pass: 'kkuh hwxk zzeq ojot',
       },
     });
   }
@@ -20,7 +21,7 @@ export class MailService {
   async sendOrderStatusUpdateEmail(to: string, orderId: number, status: string) {
     try {
       const info = await this.transporter.sendMail({
-        from: '"Our Store" <noreply@ourstore.com>',
+        from: '"CodeGrid" <codgridbd@gmail.com>',
         to,
         subject: `Order Status Update - #${orderId}`,
         text: `Hello, the status of your order #${orderId} has been updated to: ${status}.`,
