@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode, UseInterceptors, UploadedFiles, BadRequestException } from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ProductsService } from './products.service';
@@ -73,6 +74,7 @@ export class ProductsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
   async findAll() {
     const data = await this.productsService.findAll();
     return {
@@ -84,6 +86,7 @@ export class ProductsController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
   async findOne(@Param('id') id: string) {
     const data = await this.productsService.findOne(+id);
     return {

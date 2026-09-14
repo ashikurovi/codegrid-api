@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { FlashsellService } from './flashsell.service';
@@ -58,6 +59,7 @@ export class FlashsellController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
   async findAll() {
     const data = await this.flashsellService.findAll();
     return {
@@ -69,6 +71,7 @@ export class FlashsellController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
   async findOne(@Param('id') id: string) {
     const data = await this.flashsellService.findOne(+id);
     return {
