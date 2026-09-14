@@ -1,3 +1,4 @@
+import 'pg';
 import type { VercelRequest, VercelResponse } from '../src/vercel-types';
 import { getApp } from '../src/get-app';
 
