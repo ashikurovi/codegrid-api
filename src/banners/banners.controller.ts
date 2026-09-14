@@ -1,5 +1,4 @@
 import { Controller, Get, UseInterceptors, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode } from '@nestjs/common';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import { BannersService } from './banners.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
@@ -21,8 +20,7 @@ export class BannersController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(CacheInterceptor)
-  async findAll() {
+    async findAll() {
     const data = await this.bannersService.findAll();
     return {
       statusCode: HttpStatus.OK,
@@ -33,8 +31,7 @@ export class BannersController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(CacheInterceptor)
-  async findOne(@Param('id') id: string) {
+    async findOne(@Param('id') id: string) {
     const data = await this.bannersService.findOne(+id);
     return {
       statusCode: HttpStatus.OK,

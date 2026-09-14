@@ -1,5 +1,4 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { CampaignNoticeService } from './campaign-notice.service';
@@ -59,8 +58,7 @@ export class CampaignNoticeController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(CacheInterceptor)
-  async findAll() {
+    async findAll() {
     const data = await this.campaignNoticeService.findAll();
     return {
       statusCode: HttpStatus.OK,
@@ -71,8 +69,7 @@ export class CampaignNoticeController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(CacheInterceptor)
-  async findOne(@Param('id') id: string) {
+    async findOne(@Param('id') id: string) {
     const data = await this.campaignNoticeService.findOne(+id);
     return {
       statusCode: HttpStatus.OK,
