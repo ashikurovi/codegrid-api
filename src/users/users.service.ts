@@ -33,11 +33,16 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({
+      select: { id: true, name: true, email: true, phone: true, deliveryaddress: true, division: true, city: true, role: true, picture: true, isBanned: true }
+    });
   }
 
   async findOne(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({ 
+      where: { id },
+      select: { id: true, name: true, email: true, phone: true, deliveryaddress: true, division: true, city: true, role: true, picture: true, isBanned: true }
+    });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -45,7 +50,10 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOne({ where: { email } });
+    return await this.userRepository.findOne({ 
+      where: { email },
+      select: { id: true, name: true, email: true, password: true, phone: true, deliveryaddress: true, division: true, city: true, role: true, picture: true, isBanned: true } // Password might be needed for auth checks here
+    });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {

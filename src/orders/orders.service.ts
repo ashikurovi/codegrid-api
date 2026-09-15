@@ -58,6 +58,17 @@ export class OrdersService {
           product: true,
         },
       },
+      select: {
+        id: true,
+        status: true,
+        totalAmount: true,
+        shippingAddress: true,
+        paymentMethod: true,
+        createdAt: true,
+        updatedAt: true,
+        user: { id: true, name: true, email: true },
+        items: { id: true, quantity: true, product: { id: true, title: true, currentPrice: true, thumbnail: true } }
+      },
       order: { createdAt: 'DESC' },
     });
   }
@@ -69,6 +80,16 @@ export class OrdersService {
         items: {
           product: true,
         },
+      },
+      select: {
+        id: true,
+        status: true,
+        totalAmount: true,
+        shippingAddress: true,
+        paymentMethod: true,
+        createdAt: true,
+        updatedAt: true,
+        items: { id: true, quantity: true, product: { id: true, title: true, currentPrice: true, thumbnail: true } }
       },
       order: { createdAt: 'DESC' },
     });
@@ -99,6 +120,17 @@ export class OrdersService {
           },
           user: true
         },
+        select: {
+          id: true,
+          status: true,
+          totalAmount: true,
+          shippingAddress: true,
+          paymentMethod: true,
+          createdAt: true,
+          updatedAt: true,
+          user: { id: true, name: true, email: true },
+          items: { id: true, quantity: true, product: { id: true, title: true, currentPrice: true, thumbnail: true } }
+        }
       });
     }
 
@@ -117,6 +149,17 @@ export class OrdersService {
           product: true,
         },
       },
+      select: {
+        id: true,
+        status: true,
+        totalAmount: true,
+        shippingAddress: true,
+        paymentMethod: true,
+        createdAt: true,
+        updatedAt: true,
+        user: { id: true, name: true, email: true },
+        items: { id: true, quantity: true, product: { id: true, title: true, currentPrice: true, thumbnail: true } }
+      }
     });
     if (!order) {
       throw new NotFoundException(`Order with ID ${id} not found`);
@@ -157,14 +200,14 @@ export class OrdersService {
 
       if (isConfirmed && !wasConfirmed) {
         for (const item of updatedOrder.items) {
-          if (item.product?.title) {
+          if (item.product?.id && item.product?.title) {
             await this.inventoryService.adjustStockByProduct(
               item.product.title,
               -item.quantity,
               `Order #${updatedOrder.id} confirmed`
             );
             
-            const productEntity = await this.productRepository.findOne({ where: { title: item.product.title } });
+            const productEntity = await this.productRepository.findOne({ where: { id: item.product.id } });
             if (productEntity) {
               productEntity.stock = Math.max(0, (productEntity.stock || 0) - item.quantity);
               await this.productRepository.save(productEntity);
@@ -173,14 +216,14 @@ export class OrdersService {
         }
       } else if (status === OrderStatus.REFUNDED) {
         for (const item of updatedOrder.items) {
-          if (item.product?.title) {
+          if (item.product?.id && item.product?.title) {
             await this.inventoryService.adjustStockByProduct(
               item.product.title,
               item.quantity,
               `Order #${updatedOrder.id} refunded`
             );
 
-            const productEntity = await this.productRepository.findOne({ where: { title: item.product.title } });
+            const productEntity = await this.productRepository.findOne({ where: { id: item.product.id } });
             if (productEntity) {
               productEntity.stock = (productEntity.stock || 0) + item.quantity;
               await this.productRepository.save(productEntity);

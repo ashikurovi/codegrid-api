@@ -36,6 +36,20 @@ export class ProductsService {
         sizes: true,
         types: true,
       },
+      select: {
+        id: true,
+        title: true,
+        originalPrice: true,
+        currentPrice: true,
+        stock: true,
+        thumbnail: true,
+        images: true,
+        category: { id: true, name: true },
+        subCategory: { id: true, name: true },
+        brand: { id: true, name: true },
+        sizes: { id: true, name: true },
+        types: { id: true, name: true }
+      }
     });
   }
 
@@ -49,6 +63,24 @@ export class ProductsService {
         sizes: true,
         types: true,
       },
+      select: {
+        id: true,
+        title: true,
+        originalPrice: true,
+        currentPrice: true,
+        stock: true,
+        variantLabel: true,
+        description: true,
+        additionalInfo: true,
+        features: true,
+        thumbnail: true,
+        images: true,
+        category: { id: true, name: true },
+        subCategory: { id: true, name: true },
+        brand: { id: true, name: true },
+        sizes: { id: true, name: true },
+        types: { id: true, name: true }
+      }
     });
     
     if (!product) {
