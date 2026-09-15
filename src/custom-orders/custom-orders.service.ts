@@ -85,9 +85,10 @@ export class CustomOrdersService {
     const updatedCustomOrder = await this.customOrderRepository.save(customOrder);
 
     if (oldStatus !== status) {
-      if (updatedCustomOrder.user && updatedCustomOrder.user.email) {
-        this.mailService.sendCustomOrderStatusUpdateEmail(
-          updatedCustomOrder.user.email,
+      const recipientEmail = updatedCustomOrder.user?.email || updatedCustomOrder.customerEmail;
+      if (recipientEmail) {
+        await this.mailService.sendCustomOrderStatusUpdateEmail(
+          recipientEmail,
           updatedCustomOrder.id,
           updatedCustomOrder.status,
         );

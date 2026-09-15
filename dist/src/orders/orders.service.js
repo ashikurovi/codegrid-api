@@ -208,8 +208,8 @@ let OrdersService = class OrdersService {
                     }
                 }
             }
-            if (updatedOrder.user && updatedOrder.user.email) {
-                this.mailService.sendOrderStatusUpdateEmail(updatedOrder.user.email, updatedOrder.id, updatedOrder.status);
+            if (updatedOrder.user?.email) {
+                await this.mailService.sendOrderStatusUpdateEmail(updatedOrder.user.email, updatedOrder.id, updatedOrder.status);
             }
         }
         return updatedOrder;

@@ -50,12 +50,12 @@ let MailService = MailService_1 = class MailService {
     constructor() {
         this.logger = new common_1.Logger(MailService_1.name);
         this.transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
+            host: process.env.MAIL_HOST || 'smtp.gmail.com',
+            port: Number(process.env.MAIL_PORT || 465),
+            secure: process.env.MAIL_SECURE !== 'false',
             auth: {
-                user: 'codgridbd@gmail.com',
-                pass: 'kkuh hwxk zzeq ojot',
+                user: process.env.MAIL_USER || 'codgridbd@gmail.com',
+                pass: process.env.MAIL_PASSWORD || 'kkuh hwxk zzeq ojot',
             },
         });
     }
@@ -77,7 +77,7 @@ let MailService = MailService_1 = class MailService {
     async sendCustomOrderStatusUpdateEmail(to, customOrderId, status) {
         try {
             const info = await this.transporter.sendMail({
-                from: '"Our Store" <noreply@ourstore.com>',
+                from: '"CodeGrid" <codgridbd@gmail.com>',
                 to,
                 subject: `Custom Order Status Update - #${customOrderId}`,
                 text: `Hello, the status of your Custom Order #${customOrderId} has been updated to: ${status}.`,

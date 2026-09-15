@@ -8,12 +8,11 @@ export class MailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
+      host:'smtp.gmail.com',
+     
       auth: {
-        user: 'codgridbd@gmail.com',
-        pass: 'kkuh hwxk zzeq ojot',
+        user: 'codegridbd@gmail.com',
+        pass:'kkuh hwxk zzeq ojot',
       },
     });
   }
@@ -36,7 +35,7 @@ export class MailService {
   async sendCustomOrderStatusUpdateEmail(to: string, customOrderId: number, status: string) {
     try {
       const info = await this.transporter.sendMail({
-        from: '"Our Store" <noreply@ourstore.com>',
+        from: '"CodeGrid" <codgridbd@gmail.com>',
         to,
         subject: `Custom Order Status Update - #${customOrderId}`,
         text: `Hello, the status of your Custom Order #${customOrderId} has been updated to: ${status}.`,
