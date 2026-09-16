@@ -16,5 +16,8 @@ export declare class CreateOrderDto {
     customerName?: string;
     customerEmail?: string;
     customerPhone?: string;
+    deviceId?: string;
+    device?: string;
+    location?: string;
 }
 export {};

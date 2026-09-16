@@ -63,6 +63,15 @@ export class Order {
   @Column({ type: 'text', nullable: true })
   orderNotes: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  deviceId: string;
+
+  @Column({ type: 'text', nullable: true })
+  device: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  location: string;
+
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   totalAmount: number;
 

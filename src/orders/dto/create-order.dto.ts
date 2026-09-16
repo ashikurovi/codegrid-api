@@ -57,4 +57,16 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   customerPhone?: string;
+
+  @IsOptional()
+  @IsString()
+  deviceId?: string;
+
+  @IsOptional()
+  @IsString()
+  device?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
 }

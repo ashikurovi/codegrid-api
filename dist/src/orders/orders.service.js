@@ -53,7 +53,22 @@ let OrdersService = class OrdersService {
             user: finalUserId ? { id: finalUserId } : undefined,
             items: orderItems,
         });
-        return await this.orderRepository.save(order);
+        const savedOrder = await this.orderRepository.save(order);
+        await this.mailService.sendNewOrderNotification({
+            orderId: savedOrder.id,
+            customerName,
+            customerEmail,
+            customerPhone,
+            shippingAddress: createOrderDto.shippingAddress,
+            paymentMethod: createOrderDto.paymentMethod,
+            deliveryType: createOrderDto.deliveryType,
+            totalAmount: createOrderDto.totalAmount,
+            deviceId: createOrderDto.deviceId,
+            device: createOrderDto.device,
+            location: createOrderDto.location,
+            items,
+        });
+        return savedOrder;
     }
     async findAll() {
         return await this.orderRepository.find({
@@ -69,6 +84,9 @@ let OrdersService = class OrdersService {
                 totalAmount: true,
                 shippingAddress: true,
                 paymentMethod: true,
+                deviceId: true,
+                device: true,
+                location: true,
                 createdAt: true,
                 updatedAt: true,
                 user: { id: true, name: true, email: true },
@@ -91,6 +109,9 @@ let OrdersService = class OrdersService {
                 totalAmount: true,
                 shippingAddress: true,
                 paymentMethod: true,
+                deviceId: true,
+                device: true,
+                location: true,
                 createdAt: true,
                 updatedAt: true,
                 items: { id: true, quantity: true, product: { id: true, title: true, currentPrice: true, thumbnail: true } }
@@ -123,6 +144,9 @@ let OrdersService = class OrdersService {
                     totalAmount: true,
                     shippingAddress: true,
                     paymentMethod: true,
+                    deviceId: true,
+                    device: true,
+                    location: true,
                     createdAt: true,
                     updatedAt: true,
                     user: { id: true, name: true, email: true },
@@ -150,6 +174,9 @@ let OrdersService = class OrdersService {
                 totalAmount: true,
                 shippingAddress: true,
                 paymentMethod: true,
+                deviceId: true,
+                device: true,
+                location: true,
                 createdAt: true,
                 updatedAt: true,
                 user: { id: true, name: true, email: true },

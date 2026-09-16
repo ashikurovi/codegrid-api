@@ -26,6 +26,9 @@ export declare class Order {
     deliveryType: DeliveryType;
     deliveryFee: number;
     orderNotes: string;
+    deviceId: string;
+    device: string;
+    location: string;
     totalAmount: number;
     createdAt: Date;
     updatedAt: Date;
