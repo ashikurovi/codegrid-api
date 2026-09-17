@@ -19,11 +19,13 @@ const typeorm_2 = require("typeorm");
 const order_entity_1 = require("../orders/entities/order.entity");
 const custom_order_entity_1 = require("../custom-orders/entities/custom-order.entity");
 const user_entity_1 = require("../users/entities/user.entity");
+const costing_entity_1 = require("../costing/entities/costing.entity");
 let DashboardService = class DashboardService {
-    constructor(orderRepository, customOrderRepository, userRepository) {
+    constructor(orderRepository, customOrderRepository, userRepository, costingRepository) {
         this.orderRepository = orderRepository;
         this.customOrderRepository = customOrderRepository;
         this.userRepository = userRepository;
+        this.costingRepository = costingRepository;
     }
     getDateKey(date) {
         return new Date(date).toISOString().slice(0, 10);
@@ -64,7 +66,7 @@ let DashboardService = class DashboardService {
             end: this.getDateKey(end),
         };
     }
-    createMetricSummary(dateKey, regularOrders, customOrders) {
+    createMetricSummary(dateKey, regularOrders, customOrders, costingRecords = []) {
         const summary = {
             date: dateKey,
             totalSell: 0,
@@ -78,10 +80,7 @@ let DashboardService = class DashboardService {
         regularOrders.forEach((order) => {
             const isDelivered = order.status === order_entity_1.OrderStatus.DELIVERED;
             const sell = isDelivered ? Number(order.totalAmount || 0) : 0;
-            const cost = isDelivered ? this.getOrderCost(order) : 0;
             summary.totalSell += sell;
-            summary.totalCost += cost;
-            summary.income += sell - cost;
             if (order.status === order_entity_1.OrderStatus.PENDING)
                 summary.pending += 1;
             if (order.status === order_entity_1.OrderStatus.SHIPPED)
@@ -94,22 +93,22 @@ let DashboardService = class DashboardService {
         customOrders.forEach((order) => {
             const isDelivered = order.status === custom_order_entity_1.CustomOrderStatus.DELIVERED;
             const sell = isDelivered ? Number(order.price || 0) * Number(order.quantity || 1) : 0;
-            const cost = isDelivered ? this.getCustomOrderCost(order) : 0;
             summary.totalSell += sell;
-            summary.totalCost += cost;
-            summary.income += sell - cost;
             if (order.status === custom_order_entity_1.CustomOrderStatus.NEW_REQUEST)
                 summary.pending += 1;
             if (order.status === custom_order_entity_1.CustomOrderStatus.DELIVERED)
                 summary.delivered += 1;
         });
+        summary.totalCost = costingRecords.reduce((total, record) => total + Number(record.cost || 0), 0);
+        summary.income = summary.totalSell - summary.totalCost;
         return summary;
     }
     async getDashboardData() {
-        const [orders, customOrders, userCount] = await Promise.all([
+        const [orders, customOrders, userCount, costingRecords] = await Promise.all([
             this.orderRepository.find({ relations: { user: true, items: { product: true } } }),
             this.customOrderRepository.find({ relations: { user: true } }),
             this.userRepository.count(),
+            this.costingRepository.find(),
         ]);
         const deliveredOrders = orders.filter((order) => order.status === order_entity_1.OrderStatus.DELIVERED);
         const deliveredCustomOrders = customOrders.filter((order) => order.status === custom_order_entity_1.CustomOrderStatus.DELIVERED);
@@ -120,8 +119,7 @@ let DashboardService = class DashboardService {
         const activeCustomOrders = customOrders.filter((order) => order.status !== custom_order_entity_1.CustomOrderStatus.DELIVERED).length;
         const revenue = orderRevenue + customRevenue;
         const totalSell = revenue;
-        const totalCost = deliveredOrders.reduce((total, order) => total + this.getOrderCost(order), 0)
-            + deliveredCustomOrders.reduce((total, order) => total + this.getCustomOrderCost(order), 0);
+        const totalCost = costingRecords.reduce((total, record) => total + Number(record.cost || 0), 0);
         const income = totalSell - totalCost;
         const currentYear = new Date().getFullYear();
         const monthlyRevenue = Array.from({ length: 12 }, (_, month) => {
@@ -137,7 +135,8 @@ let DashboardService = class DashboardService {
         const dailySummary = dailyDates.map((dateKey) => {
             const regularOrdersForDay = orders.filter((order) => this.getDateKey(order.createdAt) === dateKey);
             const customOrdersForDay = customOrders.filter((order) => this.getDateKey(order.createdAt) === dateKey);
-            return this.createMetricSummary(dateKey, regularOrdersForDay, customOrdersForDay);
+            const costingForDay = costingRecords.filter((record) => this.getDateKey(record.createdAt) === dateKey);
+            return this.createMetricSummary(dateKey, regularOrdersForDay, customOrdersForDay, costingForDay);
         });
         const weeklySummary = [];
         const weekStart = new Date();
@@ -154,10 +153,14 @@ let DashboardService = class DashboardService {
                 const dateKey = this.getDateKey(order.createdAt);
                 return dateKey >= range.start && dateKey <= range.end;
             });
+            const costingForWeek = costingRecords.filter((record) => {
+                const dateKey = this.getDateKey(record.createdAt);
+                return dateKey >= range.start && dateKey <= range.end;
+            });
             weeklySummary.push({
                 weekStart: range.start,
                 weekEnd: range.end,
-                ...this.createMetricSummary(`${range.start} to ${range.end}`, regularOrdersForWeek, customOrdersForWeek),
+                ...this.createMetricSummary(`${range.start} to ${range.end}`, regularOrdersForWeek, customOrdersForWeek, costingForWeek),
             });
         }
         const recentSales = [
@@ -219,7 +222,9 @@ exports.DashboardService = DashboardService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(order_entity_1.Order)),
     __param(1, (0, typeorm_1.InjectRepository)(custom_order_entity_1.CustomOrder)),
     __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(3, (0, typeorm_1.InjectRepository)(costing_entity_1.Costing)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository])
 ], DashboardService);

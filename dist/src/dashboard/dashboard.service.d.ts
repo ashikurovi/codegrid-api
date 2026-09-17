@@ -2,11 +2,13 @@ import { Repository } from 'typeorm';
 import { Order } from '../orders/entities/order.entity';
 import { CustomOrder } from '../custom-orders/entities/custom-order.entity';
 import { User } from '../users/entities/user.entity';
+import { Costing } from '../costing/entities/costing.entity';
 export declare class DashboardService {
     private readonly orderRepository;
     private readonly customOrderRepository;
     private readonly userRepository;
-    constructor(orderRepository: Repository<Order>, customOrderRepository: Repository<CustomOrder>, userRepository: Repository<User>);
+    private readonly costingRepository;
+    constructor(orderRepository: Repository<Order>, customOrderRepository: Repository<CustomOrder>, userRepository: Repository<User>, costingRepository: Repository<Costing>);
     private getDateKey;
     private getOrderCost;
     private getCustomOrderCost;

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Order, OrderStatus } from '../orders/entities/order.entity';
 import { CustomOrder, CustomOrderStatus } from '../custom-orders/entities/custom-order.entity';
 import { User } from '../users/entities/user.entity';
+import { Costing } from '../costing/entities/costing.entity';
 
 @Injectable()
 export class DashboardService {
@@ -14,6 +15,8 @@ export class DashboardService {
     private readonly customOrderRepository: Repository<CustomOrder>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Costing)
+    private readonly costingRepository: Repository<Costing>,
   ) {}
 
   private getDateKey(date: Date) {
@@ -64,7 +67,7 @@ export class DashboardService {
     };
   }
 
-  private createMetricSummary(dateKey: string, regularOrders: Order[], customOrders: CustomOrder[]) {
+  private createMetricSummary(dateKey: string, regularOrders: Order[], customOrders: CustomOrder[], costingRecords: Costing[] = []) {
     const summary = {
       date: dateKey,
       totalSell: 0,
@@ -79,11 +82,8 @@ export class DashboardService {
     regularOrders.forEach((order) => {
       const isDelivered = order.status === OrderStatus.DELIVERED;
       const sell = isDelivered ? Number(order.totalAmount || 0) : 0;
-      const cost = isDelivered ? this.getOrderCost(order) : 0;
 
       summary.totalSell += sell;
-      summary.totalCost += cost;
-      summary.income += sell - cost;
 
       if (order.status === OrderStatus.PENDING) summary.pending += 1;
       if (order.status === OrderStatus.SHIPPED) summary.shipped += 1;
@@ -94,24 +94,25 @@ export class DashboardService {
     customOrders.forEach((order) => {
       const isDelivered = order.status === CustomOrderStatus.DELIVERED;
       const sell = isDelivered ? Number(order.price || 0) * Number(order.quantity || 1) : 0;
-      const cost = isDelivered ? this.getCustomOrderCost(order) : 0;
 
       summary.totalSell += sell;
-      summary.totalCost += cost;
-      summary.income += sell - cost;
 
       if (order.status === CustomOrderStatus.NEW_REQUEST) summary.pending += 1;
       if (order.status === CustomOrderStatus.DELIVERED) summary.delivered += 1;
     });
 
+    summary.totalCost = costingRecords.reduce((total, record) => total + Number(record.cost || 0), 0);
+    summary.income = summary.totalSell - summary.totalCost;
+
     return summary;
   }
 
   async getDashboardData() {
-    const [orders, customOrders, userCount] = await Promise.all([
+    const [orders, customOrders, userCount, costingRecords] = await Promise.all([
       this.orderRepository.find({ relations: { user: true, items: { product: true } } }),
       this.customOrderRepository.find({ relations: { user: true } }),
       this.userRepository.count(),
+      this.costingRepository.find(),
     ]);
 
     const deliveredOrders = orders.filter((order) => order.status === OrderStatus.DELIVERED);
@@ -124,8 +125,7 @@ export class DashboardService {
     const revenue = orderRevenue + customRevenue;
 
     const totalSell = revenue;
-    const totalCost = deliveredOrders.reduce((total, order) => total + this.getOrderCost(order), 0)
-      + deliveredCustomOrders.reduce((total, order) => total + this.getCustomOrderCost(order), 0);
+    const totalCost = costingRecords.reduce((total, record) => total + Number(record.cost || 0), 0);
     const income = totalSell - totalCost;
 
     const currentYear = new Date().getFullYear();
@@ -144,7 +144,8 @@ export class DashboardService {
     const dailySummary = dailyDates.map((dateKey) => {
       const regularOrdersForDay = orders.filter((order) => this.getDateKey(order.createdAt) === dateKey);
       const customOrdersForDay = customOrders.filter((order) => this.getDateKey(order.createdAt) === dateKey);
-      return this.createMetricSummary(dateKey, regularOrdersForDay, customOrdersForDay);
+      const costingForDay = costingRecords.filter((record) => this.getDateKey(record.createdAt) === dateKey);
+      return this.createMetricSummary(dateKey, regularOrdersForDay, customOrdersForDay, costingForDay);
     });
 
     const weeklySummary = [];
@@ -166,10 +167,15 @@ export class DashboardService {
         return dateKey >= range.start && dateKey <= range.end;
       });
 
+      const costingForWeek = costingRecords.filter((record) => {
+        const dateKey = this.getDateKey(record.createdAt);
+        return dateKey >= range.start && dateKey <= range.end;
+      });
+
       weeklySummary.push({
         weekStart: range.start,
         weekEnd: range.end,
-        ...this.createMetricSummary(`${range.start} to ${range.end}`, regularOrdersForWeek, customOrdersForWeek),
+        ...this.createMetricSummary(`${range.start} to ${range.end}`, regularOrdersForWeek, customOrdersForWeek, costingForWeek),
       });
     }
 
