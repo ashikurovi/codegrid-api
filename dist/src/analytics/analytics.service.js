@@ -32,12 +32,12 @@ let AnalyticsService = class AnalyticsService {
             this.userRepository.count(),
         ]);
         const validOrders = orders.filter((order) => order.status !== order_entity_1.OrderStatus.REFUNDED);
-        const validCustomOrders = customOrders.filter((order) => order.status !== 'New Request');
+        const validCustomOrders = customOrders.filter((order) => order.status !== custom_order_entity_1.CustomOrderStatus.NEW_REQUEST);
         const grossRevenue = validOrders.reduce((total, order) => total + Number(order.totalAmount || 0), 0)
             + validCustomOrders.reduce((total, order) => total + Number(order.price || 0) * Number(order.quantity || 1), 0);
         const totalOrders = orders.length + customOrders.length;
         const completedOrders = orders.filter((order) => order.status === order_entity_1.OrderStatus.DELIVERED).length
-            + customOrders.filter((order) => order.status === 'Delivered').length;
+            + customOrders.filter((order) => order.status === custom_order_entity_1.CustomOrderStatus.DELIVERED).length;
         const currentYear = new Date().getFullYear();
         const revenueOverTime = Array.from({ length: 12 }, (_, month) => {
             const regularRevenue = validOrders

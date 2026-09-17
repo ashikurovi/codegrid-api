@@ -94,8 +94,9 @@ let DashboardService = class DashboardService {
             const isDelivered = order.status === custom_order_entity_1.CustomOrderStatus.DELIVERED;
             const sell = isDelivered ? Number(order.price || 0) * Number(order.quantity || 1) : 0;
             summary.totalSell += sell;
-            if (order.status === custom_order_entity_1.CustomOrderStatus.NEW_REQUEST)
+            if ([custom_order_entity_1.CustomOrderStatus.NEW_REQUEST, custom_order_entity_1.CustomOrderStatus.QUOTED, custom_order_entity_1.CustomOrderStatus.IN_PRODUCTION].includes(order.status)) {
                 summary.pending += 1;
+            }
             if (order.status === custom_order_entity_1.CustomOrderStatus.DELIVERED)
                 summary.delivered += 1;
         });
@@ -183,7 +184,8 @@ let DashboardService = class DashboardService {
             .slice(0, 5)
             .map(({ id, name, email, amount }) => ({ id, name, email, amount }));
         const statusSummary = {
-            pending: orders.filter((order) => order.status === order_entity_1.OrderStatus.PENDING).length + customOrders.filter((order) => order.status === custom_order_entity_1.CustomOrderStatus.NEW_REQUEST).length,
+            pending: orders.filter((order) => order.status === order_entity_1.OrderStatus.PENDING).length
+                + customOrders.filter((order) => [custom_order_entity_1.CustomOrderStatus.NEW_REQUEST, custom_order_entity_1.CustomOrderStatus.QUOTED, custom_order_entity_1.CustomOrderStatus.IN_PRODUCTION].includes(order.status)).length,
             shipped: orders.filter((order) => order.status === order_entity_1.OrderStatus.SHIPPED).length,
             delivered: orders.filter((order) => order.status === order_entity_1.OrderStatus.DELIVERED).length + customOrders.filter((order) => order.status === custom_order_entity_1.CustomOrderStatus.DELIVERED).length,
             refunded: orders.filter((order) => order.status === order_entity_1.OrderStatus.REFUNDED).length,

@@ -97,7 +97,9 @@ export class DashboardService {
 
       summary.totalSell += sell;
 
-      if (order.status === CustomOrderStatus.NEW_REQUEST) summary.pending += 1;
+      if ([CustomOrderStatus.NEW_REQUEST, CustomOrderStatus.QUOTED, CustomOrderStatus.IN_PRODUCTION].includes(order.status)) {
+        summary.pending += 1;
+      }
       if (order.status === CustomOrderStatus.DELIVERED) summary.delivered += 1;
     });
 
@@ -200,7 +202,8 @@ export class DashboardService {
       .map(({ id, name, email, amount }) => ({ id, name, email, amount }));
 
     const statusSummary = {
-      pending: orders.filter((order) => order.status === OrderStatus.PENDING).length + customOrders.filter((order) => order.status === CustomOrderStatus.NEW_REQUEST).length,
+      pending: orders.filter((order) => order.status === OrderStatus.PENDING).length
+        + customOrders.filter((order) => [CustomOrderStatus.NEW_REQUEST, CustomOrderStatus.QUOTED, CustomOrderStatus.IN_PRODUCTION].includes(order.status)).length,
       shipped: orders.filter((order) => order.status === OrderStatus.SHIPPED).length,
       delivered: orders.filter((order) => order.status === OrderStatus.DELIVERED).length + customOrders.filter((order) => order.status === CustomOrderStatus.DELIVERED).length,
       refunded: orders.filter((order) => order.status === OrderStatus.REFUNDED).length,
