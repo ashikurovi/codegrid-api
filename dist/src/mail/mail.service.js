@@ -108,7 +108,7 @@ let MailService = MailService_1 = class MailService {
     }
     async sendOrderStatusUpdateEmail(to, orderId, status) {
         const safeStatus = this.escapeHtml(status);
-        const trackingUrl = `${process.env.FRONTEND_URL || 'https://codegridbd.com'}/main/ordertraking?order=CG-${String(orderId).padStart(4, '0')}`;
+        const trackingUrl = `${process.env.FRONTEND_URL || 'https://www.codegrid.shop'}/main/ordertraking?order=CG-${String(orderId).padStart(4, '0')}`;
         try {
             const info = await this.transporter.sendMail({
                 from: '"CodeGrid" <codegridbd@gmail.com>',
@@ -147,7 +147,7 @@ let MailService = MailService_1 = class MailService {
                 to,
                 subject: `Your CodeGrid cart is waiting`,
                 text: `Hi ${name || 'there'},\n\nWe noticed you left some items in your cart. Come back and complete your purchase!`,
-                html: `<div style="background:#fefce8;padding:32px;font-family:Arial,sans-serif;color:#1f2937"><div style="max-width:560px;margin:auto;background:#fff;border:1px solid #fde68a"><div style="background:#facc15;padding:28px"><div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#713f12">CodeGrid Reminder</div><h1 style="margin:10px 0 0;font-size:26px;color:#422006">Your cart is waiting</h1></div><div style="padding:28px"><p style="font-size:17px">Hi ${safeName},</p><p style="color:#4b5563;line-height:1.7">You left a few items in your CodeGrid cart. They are waiting for you to complete your order.</p><a href="https://codegridbd.com/main/checkout" style="display:inline-block;background:#111827;color:#fff;padding:14px 22px;text-decoration:none;font-weight:bold;text-transform:uppercase;letter-spacing:1px">Return to checkout</a></div><div style="padding:16px 28px;background:#fef9c3;color:#854d0e;font-size:12px">Your favorites may not stay available forever.</div></div></div>`,
+                html: `<div style="background:#fefce8;padding:32px;font-family:Arial,sans-serif;color:#1f2937"><div style="max-width:560px;margin:auto;background:#fff;border:1px solid #fde68a"><div style="background:#facc15;padding:28px"><div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#713f12">CodeGrid Reminder</div><h1 style="margin:10px 0 0;font-size:26px;color:#422006">Your cart is waiting</h1></div><div style="padding:28px"><p style="font-size:17px">Hi ${safeName},</p><p style="color:#4b5563;line-height:1.7">You left a few items in your CodeGrid cart. They are waiting for you to complete your order.</p><a href="${process.env.FRONTEND_URL || 'https://www.codegrid.shop'}/main/checkout" style="display:inline-block;background:#111827;color:#fff;padding:14px 22px;text-decoration:none;font-weight:bold;text-transform:uppercase;letter-spacing:1px">Return to checkout</a></div><div style="padding:16px 28px;background:#fef9c3;color:#854d0e;font-size:12px">Your favorites may not stay available forever.</div></div></div>`,
             });
             this.logger.log(`Abandoned cart email sent: ${info.messageId}`);
         }
