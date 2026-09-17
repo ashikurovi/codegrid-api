@@ -14,12 +14,13 @@ const typeorm_1 = require("@nestjs/typeorm");
 const order_entity_1 = require("../orders/entities/order.entity");
 const custom_order_entity_1 = require("../custom-orders/entities/custom-order.entity");
 const user_entity_1 = require("../users/entities/user.entity");
+const costing_entity_1 = require("../costing/entities/costing.entity");
 let DashboardModule = class DashboardModule {
 };
 exports.DashboardModule = DashboardModule;
 exports.DashboardModule = DashboardModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([order_entity_1.Order, custom_order_entity_1.CustomOrder, user_entity_1.User])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([order_entity_1.Order, custom_order_entity_1.CustomOrder, user_entity_1.User, costing_entity_1.Costing])],
         controllers: [dashboard_controller_1.DashboardController],
         providers: [dashboard_service_1.DashboardService],
     })
