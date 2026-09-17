@@ -63,6 +63,28 @@ export class OrdersController {
     };
   }
 
+  @Post('pre-order')
+  @HttpCode(HttpStatus.CREATED)
+  async createPreOrder(@Body() createOrderDto: CreateOrderDto) {
+    const data = await this.ordersService.createPreOrder(createOrderDto);
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Pre-order created successfully',
+      data,
+    };
+  }
+
+  @Patch(':id/convert-pre-order')
+  @HttpCode(HttpStatus.OK)
+  async convertPreOrder(@Param('id') id: string) {
+    const data = await this.ordersService.convertPreOrder(+id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Pre-order converted to confirmed order successfully',
+      data,
+    };
+  }
+
   @Patch(':id/status')
   @HttpCode(HttpStatus.OK)
   async updateStatus(@Param('id') id: string, @Body() updateOrderStatusDto: UpdateOrderStatusDto) {

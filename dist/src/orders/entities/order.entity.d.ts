@@ -2,6 +2,7 @@ import { OrderItem } from './order-item.entity';
 import { User } from '../../users/entities/user.entity';
 export declare enum OrderStatus {
     PENDING = "Pending",
+    PRE_ORDER = "Pre Order",
     PROCESSING = "Processing",
     SHIPPED = "Shipped",
     DELIVERED = "Delivered",
@@ -30,6 +31,8 @@ export declare class Order {
     device: string;
     location: string;
     totalAmount: number;
+    isPreOrder: boolean;
+    depositAmount: number;
     createdAt: Date;
     updatedAt: Date;
 }

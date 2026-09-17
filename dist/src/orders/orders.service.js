@@ -62,6 +62,8 @@ let OrdersService = class OrdersService {
             user: finalUserId ? { id: finalUserId } : undefined,
             items: orderItems,
             totalAmount: Number(rest.totalAmount ?? 0) - Number(discountAmount ?? 0),
+            isPreOrder: Boolean(rest.status === order_entity_1.OrderStatus.PRE_ORDER || createOrderDto.isPreOrder),
+            depositAmount: Number(createOrderDto.depositAmount ?? 0),
         });
         const savedOrder = await this.orderRepository.save(order);
         await this.mailService.sendNewOrderNotification({
@@ -79,6 +81,22 @@ let OrdersService = class OrdersService {
             items,
         });
         return savedOrder;
+    }
+    async createPreOrder(createOrderDto) {
+        const preOrderPayload = {
+            ...createOrderDto,
+            status: order_entity_1.OrderStatus.PRE_ORDER,
+            isPreOrder: true,
+            depositAmount: Number(createOrderDto.depositAmount ?? 0),
+        };
+        return this.create(preOrderPayload);
+    }
+    async convertPreOrder(id) {
+        const order = await this.findOne(id);
+        if (!order.isPreOrder && order.status !== order_entity_1.OrderStatus.PRE_ORDER) {
+            throw new common_1.NotFoundException(`Order #${id} is not a pre-order and cannot be converted.`);
+        }
+        return this.updateStatus(id, order_entity_1.OrderStatus.PROCESSING);
     }
     async findAll() {
         return await this.orderRepository.find({
@@ -217,6 +235,7 @@ let OrdersService = class OrdersService {
         const order = await this.findOne(id);
         const oldStatus = order.status;
         order.status = status;
+        order.isPreOrder = status === order_entity_1.OrderStatus.PRE_ORDER;
         const updatedOrder = await this.orderRepository.save(order);
         if (oldStatus !== status) {
             const isConfirmed = status === order_entity_1.OrderStatus.PROCESSING || status === order_entity_1.OrderStatus.SHIPPED;

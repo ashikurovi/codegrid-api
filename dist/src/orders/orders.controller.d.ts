@@ -31,6 +31,16 @@ export declare class OrdersController {
         message: string;
         data: import("./entities/order.entity").Order;
     }>;
+    createPreOrder(createOrderDto: CreateOrderDto): Promise<{
+        statusCode: HttpStatus;
+        message: string;
+        data: import("./entities/order.entity").Order;
+    }>;
+    convertPreOrder(id: string): Promise<{
+        statusCode: HttpStatus;
+        message: string;
+        data: import("./entities/order.entity").Order;
+    }>;
     updateStatus(id: string, updateOrderStatusDto: UpdateOrderStatusDto): Promise<{
         statusCode: HttpStatus;
         message: string;

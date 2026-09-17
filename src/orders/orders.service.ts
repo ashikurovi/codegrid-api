@@ -59,6 +59,8 @@ export class OrdersService {
       user: finalUserId ? { id: finalUserId } : undefined,
       items: orderItems,
       totalAmount: Number(rest.totalAmount ?? 0) - Number(discountAmount ?? 0),
+      isPreOrder: Boolean(rest.status === OrderStatus.PRE_ORDER || createOrderDto.isPreOrder),
+      depositAmount: Number(createOrderDto.depositAmount ?? 0),
     });
     const savedOrder = await this.orderRepository.save(order);
     await this.mailService.sendNewOrderNotification({
@@ -76,6 +78,27 @@ export class OrdersService {
       items,
     });
     return savedOrder;
+  }
+
+  async createPreOrder(createOrderDto: CreateOrderDto): Promise<Order> {
+    const preOrderPayload: CreateOrderDto = {
+      ...createOrderDto,
+      status: OrderStatus.PRE_ORDER,
+      isPreOrder: true,
+      depositAmount: Number(createOrderDto.depositAmount ?? 0),
+    };
+
+    return this.create(preOrderPayload);
+  }
+
+  async convertPreOrder(id: number): Promise<Order> {
+    const order = await this.findOne(id);
+
+    if (!order.isPreOrder && order.status !== OrderStatus.PRE_ORDER) {
+      throw new NotFoundException(`Order #${id} is not a pre-order and cannot be converted.`);
+    }
+
+    return this.updateStatus(id, OrderStatus.PROCESSING);
   }
 
   async findAll(): Promise<Order[]> {
@@ -229,12 +252,13 @@ export class OrdersService {
   async updateStatus(id: number, status: string): Promise<Order> {
     const order = await this.findOne(id);
     const oldStatus = order.status;
-    
+
     order.status = status as any;
+    order.isPreOrder = status === OrderStatus.PRE_ORDER;
+
     const updatedOrder = await this.orderRepository.save(order);
 
     if (oldStatus !== status) {
-      // Deduct stock if order is moving from PENDING to PROCESSING or SHIPPED
       const isConfirmed = status === OrderStatus.PROCESSING || status === OrderStatus.SHIPPED;
       const wasConfirmed = oldStatus === OrderStatus.PROCESSING || oldStatus === OrderStatus.SHIPPED;
 
@@ -246,7 +270,7 @@ export class OrdersService {
               -item.quantity,
               `Order #${updatedOrder.id} confirmed`
             );
-            
+
             const productEntity = await this.productRepository.findOne({ where: { id: item.product.id } });
             if (productEntity) {
               productEntity.stock = Math.max(0, (productEntity.stock || 0) - item.quantity);

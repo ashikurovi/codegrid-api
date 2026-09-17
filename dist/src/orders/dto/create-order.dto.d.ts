@@ -8,6 +8,8 @@ export declare class CreateOrderDto {
     items: OrderItemDto[];
     shippingAddress: string;
     status?: OrderStatus;
+    isPreOrder?: boolean;
+    depositAmount?: number;
     paymentMethod?: PaymentMethod;
     deliveryType?: DeliveryType;
     deliveryFee?: number;

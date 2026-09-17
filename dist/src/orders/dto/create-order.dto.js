@@ -48,6 +48,16 @@ __decorate([
 ], CreateOrderDto.prototype, "status", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateOrderDto.prototype, "isPreOrder", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateOrderDto.prototype, "depositAmount", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsEnum)(order_entity_1.PaymentMethod),
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "paymentMethod", void 0);

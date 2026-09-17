@@ -16,6 +16,7 @@ const user_entity_1 = require("../../users/entities/user.entity");
 var OrderStatus;
 (function (OrderStatus) {
     OrderStatus["PENDING"] = "Pending";
+    OrderStatus["PRE_ORDER"] = "Pre Order";
     OrderStatus["PROCESSING"] = "Processing";
     OrderStatus["SHIPPED"] = "Shipped";
     OrderStatus["DELIVERED"] = "Delivered";
@@ -97,9 +98,17 @@ __decorate([
     __metadata("design:type", String)
 ], Order.prototype, "location", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2 }),
+    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2, default: 0 }),
     __metadata("design:type", Number)
 ], Order.prototype, "totalAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+    __metadata("design:type", Boolean)
+], Order.prototype, "isPreOrder", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Order.prototype, "depositAmount", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

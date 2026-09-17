@@ -62,6 +62,22 @@ let OrdersController = class OrdersController {
             data,
         };
     }
+    async createPreOrder(createOrderDto) {
+        const data = await this.ordersService.createPreOrder(createOrderDto);
+        return {
+            statusCode: common_1.HttpStatus.CREATED,
+            message: 'Pre-order created successfully',
+            data,
+        };
+    }
+    async convertPreOrder(id) {
+        const data = await this.ordersService.convertPreOrder(+id);
+        return {
+            statusCode: common_1.HttpStatus.OK,
+            message: 'Pre-order converted to confirmed order successfully',
+            data,
+        };
+    }
     async updateStatus(id, updateOrderStatusDto) {
         const data = await this.ordersService.updateStatus(+id, updateOrderStatusDto.status);
         return {
@@ -126,6 +142,22 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Post)('pre-order'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "createPreOrder", null);
+__decorate([
+    (0, common_1.Patch)(':id/convert-pre-order'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "convertPreOrder", null);
 __decorate([
     (0, common_1.Patch)(':id/status'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

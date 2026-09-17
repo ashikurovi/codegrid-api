@@ -4,6 +4,7 @@ import { User } from '../../users/entities/user.entity';
 
 export enum OrderStatus {
   PENDING = 'Pending',
+  PRE_ORDER = 'Pre Order',
   PROCESSING = 'Processing',
   SHIPPED = 'Shipped',
   DELIVERED = 'Delivered',
@@ -72,8 +73,14 @@ export class Order {
   @Column({ type: 'varchar', nullable: true })
   location: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   totalAmount: number;
+
+  @Column({ type: 'boolean', default: false })
+  isPreOrder: boolean;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  depositAmount: number;
 
   @CreateDateColumn()
   createdAt: Date;

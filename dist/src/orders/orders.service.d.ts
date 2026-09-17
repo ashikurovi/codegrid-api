@@ -16,6 +16,8 @@ export declare class OrdersService {
     private readonly usersService;
     constructor(orderRepository: Repository<Order>, inventoryService: InventoryService, productRepository: Repository<Product>, couponRepository: Repository<Coupon>, mailService: MailService, usersService: UsersService);
     create(createOrderDto: CreateOrderDto): Promise<Order>;
+    createPreOrder(createOrderDto: CreateOrderDto): Promise<Order>;
+    convertPreOrder(id: number): Promise<Order>;
     findAll(): Promise<Order[]>;
     findAllByUser(userId: number): Promise<Order[]>;
     trackOrder(identifier: string): Promise<Order>;
