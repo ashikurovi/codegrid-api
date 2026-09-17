@@ -69,4 +69,12 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   location?: string;
+
+  @IsOptional()
+  @IsString()
+  couponCode?: string;
+
+  @IsOptional()
+  @IsNumber()
+  discountAmount?: number;
 }

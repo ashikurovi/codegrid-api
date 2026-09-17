@@ -40,6 +40,16 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCustomProductDto.prototype, "price", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateCustomProductDto.prototype, "dtfPrintCost", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)(),
+    __metadata("design:type", Number)
+], CreateCustomProductDto.prototype, "a4PrintCost", void 0);
+__decorate([
     (0, class_validator_1.IsEnum)(custom_product_entity_1.CustomProductStatus),
     __metadata("design:type", String)
 ], CreateCustomProductDto.prototype, "status", void 0);

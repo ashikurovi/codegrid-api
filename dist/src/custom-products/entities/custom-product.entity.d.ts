@@ -12,6 +12,8 @@ export declare class CustomProduct {
     productName: string;
     category: CustomProductCategory;
     price: string;
+    dtfPrintCost: number;
+    a4PrintCost: number;
     status: CustomProductStatus;
     description: string;
     discount: string;

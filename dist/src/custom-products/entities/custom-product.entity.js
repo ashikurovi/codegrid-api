@@ -46,6 +46,14 @@ __decorate([
     __metadata("design:type", String)
 ], CustomProduct.prototype, "price", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2, default: 60 }),
+    __metadata("design:type", Number)
+], CustomProduct.prototype, "dtfPrintCost", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2, default: 150 }),
+    __metadata("design:type", Number)
+], CustomProduct.prototype, "a4PrintCost", void 0);
+__decorate([
     (0, typeorm_1.Column)({
         type: 'enum',
         enum: CustomProductStatus,

@@ -8,6 +8,8 @@ import { MailService } from '../mail/mail.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { Product } from '../products/entities/product.entity';
 import { UsersService } from '../users/users.service';
+import { Coupon } from '../coupons/entities/coupon.entity';
+
 @Injectable()
 export class OrdersService {
   constructor(
@@ -16,16 +18,26 @@ export class OrdersService {
     private readonly inventoryService: InventoryService,
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(Coupon)
+    private readonly couponRepository: Repository<Coupon>,
     private readonly mailService: MailService,
     private readonly usersService: UsersService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const { items, userId, customerName, customerEmail, customerPhone, ...rest } = createOrderDto;
+    const { items, userId, customerName, customerEmail, customerPhone, couponCode, discountAmount, ...rest } = createOrderDto;
     const orderItems = items?.map((item) => ({
       product: { id: item.productId },
       quantity: item.quantity,
     }));
+
+    if (couponCode) {
+      const coupon = await this.couponRepository.findOne({ where: { code: couponCode.trim().toUpperCase() } });
+      if (coupon && coupon.isActive && (!coupon.usageLimit || coupon.usageCount < coupon.usageLimit)) {
+        coupon.usageCount += 1;
+        await this.couponRepository.save(coupon);
+      }
+    }
 
     let finalUserId = userId;
 
@@ -46,6 +58,7 @@ export class OrdersService {
       ...rest,
       user: finalUserId ? { id: finalUserId } : undefined,
       items: orderItems,
+      totalAmount: Number(rest.totalAmount ?? 0) - Number(discountAmount ?? 0),
     });
     const savedOrder = await this.orderRepository.save(order);
     await this.mailService.sendNewOrderNotification({

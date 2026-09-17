@@ -36,6 +36,7 @@ const settings_module_1 = require("./settings/settings.module");
 const campaign_notice_module_1 = require("./campaign-notice/campaign-notice.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
 const analytics_module_1 = require("./analytics/analytics.module");
+const coupons_module_1 = require("./coupons/coupons.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -82,6 +83,7 @@ exports.AppModule = AppModule = __decorate([
             campaign_notice_module_1.CampaignNoticeModule,
             dashboard_module_1.DashboardModule,
             analytics_module_1.AnalyticsModule,
+            coupons_module_1.CouponsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

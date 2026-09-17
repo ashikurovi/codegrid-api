@@ -29,6 +29,12 @@ export class CustomProduct {
   @Column()
   price: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 60 })
+  dtfPrintCost: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 150 })
+  a4PrintCost: number;
+
   @Column({
     type: 'enum',
     enum: CustomProductStatus,

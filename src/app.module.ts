@@ -27,6 +27,7 @@ import { SettingsModule } from './settings/settings.module';
 import { CampaignNoticeModule } from './campaign-notice/campaign-notice.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { CouponsModule } from './coupons/coupons.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     CampaignNoticeModule,
     DashboardModule,
     AnalyticsModule,
+    CouponsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,4 @@
-import { IsString, IsEnum, IsOptional, IsArray, ValidateNested } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsArray, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CustomProductCategory, CustomProductStatus } from '../entities/custom-product.entity';
 
@@ -20,6 +20,14 @@ export class CreateCustomProductDto {
 
   @IsString()
   price: string;
+
+  @IsOptional()
+  @IsNumber()
+  dtfPrintCost?: number;
+
+  @IsOptional()
+  @IsNumber()
+  a4PrintCost?: number;
 
   @IsEnum(CustomProductStatus)
   status: CustomProductStatus;

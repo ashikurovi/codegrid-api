@@ -19,5 +19,7 @@ export declare class CreateOrderDto {
     deviceId?: string;
     device?: string;
     location?: string;
+    couponCode?: string;
+    discountAmount?: number;
 }
 export {};

@@ -21,20 +21,29 @@ const mail_service_1 = require("../mail/mail.service");
 const inventory_service_1 = require("../inventory/inventory.service");
 const product_entity_1 = require("../products/entities/product.entity");
 const users_service_1 = require("../users/users.service");
+const coupon_entity_1 = require("../coupons/entities/coupon.entity");
 let OrdersService = class OrdersService {
-    constructor(orderRepository, inventoryService, productRepository, mailService, usersService) {
+    constructor(orderRepository, inventoryService, productRepository, couponRepository, mailService, usersService) {
         this.orderRepository = orderRepository;
         this.inventoryService = inventoryService;
         this.productRepository = productRepository;
+        this.couponRepository = couponRepository;
         this.mailService = mailService;
         this.usersService = usersService;
     }
     async create(createOrderDto) {
-        const { items, userId, customerName, customerEmail, customerPhone, ...rest } = createOrderDto;
+        const { items, userId, customerName, customerEmail, customerPhone, couponCode, discountAmount, ...rest } = createOrderDto;
         const orderItems = items?.map((item) => ({
             product: { id: item.productId },
             quantity: item.quantity,
         }));
+        if (couponCode) {
+            const coupon = await this.couponRepository.findOne({ where: { code: couponCode.trim().toUpperCase() } });
+            if (coupon && coupon.isActive && (!coupon.usageLimit || coupon.usageCount < coupon.usageLimit)) {
+                coupon.usageCount += 1;
+                await this.couponRepository.save(coupon);
+            }
+        }
         let finalUserId = userId;
         if (!finalUserId && customerEmail && customerName) {
             let user = await this.usersService.findByEmail(customerEmail);
@@ -52,6 +61,7 @@ let OrdersService = class OrdersService {
             ...rest,
             user: finalUserId ? { id: finalUserId } : undefined,
             items: orderItems,
+            totalAmount: Number(rest.totalAmount ?? 0) - Number(discountAmount ?? 0),
         });
         const savedOrder = await this.orderRepository.save(order);
         await this.mailService.sendNewOrderNotification({
@@ -251,8 +261,10 @@ exports.OrdersService = OrdersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(order_entity_1.Order)),
     __param(2, (0, typeorm_1.InjectRepository)(product_entity_1.Product)),
+    __param(3, (0, typeorm_1.InjectRepository)(coupon_entity_1.Coupon)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         inventory_service_1.InventoryService,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         mail_service_1.MailService,
         users_service_1.UsersService])
