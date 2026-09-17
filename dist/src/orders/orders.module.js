@@ -17,12 +17,13 @@ const mail_module_1 = require("../mail/mail.module");
 const inventory_module_1 = require("../inventory/inventory.module");
 const product_entity_1 = require("../products/entities/product.entity");
 const users_module_1 = require("../users/users.module");
+const coupon_entity_1 = require("../coupons/entities/coupon.entity");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
 exports.OrdersModule = OrdersModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([order_entity_1.Order, order_item_entity_1.OrderItem, product_entity_1.Product]), mail_module_1.MailModule, inventory_module_1.InventoryModule, users_module_1.UsersModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([order_entity_1.Order, order_item_entity_1.OrderItem, product_entity_1.Product, coupon_entity_1.Coupon]), mail_module_1.MailModule, inventory_module_1.InventoryModule, users_module_1.UsersModule],
         controllers: [orders_controller_1.OrdersController],
         providers: [orders_service_1.OrdersService],
         exports: [orders_service_1.OrdersService],
