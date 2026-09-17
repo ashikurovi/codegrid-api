@@ -7,6 +7,12 @@ export declare class DashboardService {
     private readonly customOrderRepository;
     private readonly userRepository;
     constructor(orderRepository: Repository<Order>, customOrderRepository: Repository<CustomOrder>, userRepository: Repository<User>);
+    private getDateKey;
+    private getOrderCost;
+    private getCustomOrderCost;
+    private getDateRangeForDays;
+    private getWeekRange;
+    private createMetricSummary;
     getDashboardData(): Promise<{
         totalRevenue: {
             value: string;
@@ -24,6 +30,26 @@ export declare class DashboardService {
             value: string;
             percentageChange: string;
         };
+        totalSell: number;
+        totalCost: number;
+        income: number;
+        statusSummary: {
+            pending: number;
+            shipped: number;
+            delivered: number;
+            refunded: number;
+        };
+        dailySummary: {
+            date: string;
+            totalSell: number;
+            totalCost: number;
+            income: number;
+            pending: number;
+            shipped: number;
+            delivered: number;
+            refunded: number;
+        }[];
+        weeklySummary: any[];
         chartData: {
             name: string;
             total: number;

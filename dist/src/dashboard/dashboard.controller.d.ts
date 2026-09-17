@@ -19,6 +19,26 @@ export declare class DashboardController {
             value: string;
             percentageChange: string;
         };
+        totalSell: number;
+        totalCost: number;
+        income: number;
+        statusSummary: {
+            pending: number;
+            shipped: number;
+            delivered: number;
+            refunded: number;
+        };
+        dailySummary: {
+            date: string;
+            totalSell: number;
+            totalCost: number;
+            income: number;
+            pending: number;
+            shipped: number;
+            delivered: number;
+            refunded: number;
+        }[];
+        weeklySummary: any[];
         chartData: {
             name: string;
             total: number;
