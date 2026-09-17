@@ -22,27 +22,21 @@ let CostingService = class CostingService {
         this.costingRepository = costingRepository;
     }
     async create(dto) {
-        const totalCost = Number(dto.totalCost ?? (Number(dto.unitCost || 0) * Number(dto.quantity || 1)));
         const costing = this.costingRepository.create({
-            ...dto,
-            quantity: Number(dto.quantity || 1),
-            unitCost: Number(dto.unitCost || 0),
-            totalCost,
-            orderId: dto.orderId ?? undefined,
-            productId: dto.productId ?? undefined,
+            note: dto.note ?? '',
+            cost: Number(dto.cost || 0),
+            reason: dto.reason ?? '',
         });
         return this.costingRepository.save(costing);
     }
     async findAll() {
         return this.costingRepository.find({
-            relations: { product: true, order: true },
             order: { createdAt: 'DESC' },
         });
     }
     async findOne(id) {
         const costing = await this.costingRepository.findOne({
             where: { id },
-            relations: { product: true, order: true },
         });
         if (!costing) {
             throw new common_1.NotFoundException(`Cost record with ID ${id} not found`);
@@ -52,10 +46,9 @@ let CostingService = class CostingService {
     async update(id, dto) {
         const costing = await this.findOne(id);
         const updated = this.costingRepository.merge(costing, {
-            ...dto,
-            quantity: dto.quantity !== undefined ? Number(dto.quantity) : costing.quantity,
-            unitCost: dto.unitCost !== undefined ? Number(dto.unitCost) : costing.unitCost,
-            totalCost: dto.totalCost !== undefined ? Number(dto.totalCost) : Number(costing.totalCost || 0),
+            note: dto.note !== undefined ? dto.note : costing.note,
+            cost: dto.cost !== undefined ? Number(dto.cost) : Number(costing.cost || 0),
+            reason: dto.reason !== undefined ? dto.reason : costing.reason,
         });
         return this.costingRepository.save(updated);
     }
@@ -65,7 +58,7 @@ let CostingService = class CostingService {
     }
     async getSummary() {
         const records = await this.costingRepository.find();
-        const totalCost = records.reduce((sum, item) => sum + Number(item.totalCost || 0), 0);
+        const totalCost = records.reduce((sum, item) => sum + Number(item.cost || 0), 0);
         return {
             totalCost,
             recordsCount: records.length,

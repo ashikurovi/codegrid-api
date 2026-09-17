@@ -11,8 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Costing = void 0;
 const typeorm_1 = require("typeorm");
-const order_entity_1 = require("../../orders/entities/order.entity");
-const product_entity_1 = require("../../products/entities/product.entity");
 let Costing = class Costing {
 };
 exports.Costing = Costing;
@@ -21,39 +19,17 @@ __decorate([
     __metadata("design:type", Number)
 ], Costing.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => order_entity_1.Order, { nullable: true, onDelete: 'SET NULL' }),
-    (0, typeorm_1.JoinColumn)({ name: 'orderId' }),
-    __metadata("design:type", order_entity_1.Order)
-], Costing.prototype, "order", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
-    __metadata("design:type", Number)
-], Costing.prototype, "orderId", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => product_entity_1.Product, { nullable: true, onDelete: 'SET NULL' }),
-    (0, typeorm_1.JoinColumn)({ name: 'productId' }),
-    __metadata("design:type", product_entity_1.Product)
-], Costing.prototype, "product", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
-    __metadata("design:type", Number)
-], Costing.prototype, "productId", void 0);
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], Costing.prototype, "note", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2, default: 0 }),
     __metadata("design:type", Number)
-], Costing.prototype, "unitCost", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'int', default: 1 }),
-    __metadata("design:type", Number)
-], Costing.prototype, "quantity", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2, default: 0 }),
-    __metadata("design:type", Number)
-], Costing.prototype, "totalCost", void 0);
+], Costing.prototype, "cost", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'text', nullable: true }),
     __metadata("design:type", String)
-], Costing.prototype, "notes", void 0);
+], Costing.prototype, "reason", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

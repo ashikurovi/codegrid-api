@@ -76,8 +76,9 @@ let DashboardService = class DashboardService {
             refunded: 0,
         };
         regularOrders.forEach((order) => {
-            const sell = Number(order.totalAmount || 0);
-            const cost = this.getOrderCost(order);
+            const isDelivered = order.status === order_entity_1.OrderStatus.DELIVERED;
+            const sell = isDelivered ? Number(order.totalAmount || 0) : 0;
+            const cost = isDelivered ? this.getOrderCost(order) : 0;
             summary.totalSell += sell;
             summary.totalCost += cost;
             summary.income += sell - cost;
@@ -91,8 +92,9 @@ let DashboardService = class DashboardService {
                 summary.refunded += 1;
         });
         customOrders.forEach((order) => {
-            const sell = Number(order.price || 0) * Number(order.quantity || 1);
-            const cost = this.getCustomOrderCost(order);
+            const isDelivered = order.status === custom_order_entity_1.CustomOrderStatus.DELIVERED;
+            const sell = isDelivered ? Number(order.price || 0) * Number(order.quantity || 1) : 0;
+            const cost = isDelivered ? this.getCustomOrderCost(order) : 0;
             summary.totalSell += sell;
             summary.totalCost += cost;
             summary.income += sell - cost;
@@ -109,24 +111,24 @@ let DashboardService = class DashboardService {
             this.customOrderRepository.find({ relations: { user: true } }),
             this.userRepository.count(),
         ]);
-        const paidOrders = orders.filter((order) => order.status !== order_entity_1.OrderStatus.REFUNDED);
-        const paidCustomOrders = customOrders.filter((order) => order.status !== custom_order_entity_1.CustomOrderStatus.NEW_REQUEST);
-        const orderRevenue = paidOrders.reduce((total, order) => total + Number(order.totalAmount || 0), 0);
-        const customRevenue = paidCustomOrders.reduce((total, order) => total + Number(order.price || 0) * Number(order.quantity || 1), 0);
+        const deliveredOrders = orders.filter((order) => order.status === order_entity_1.OrderStatus.DELIVERED);
+        const deliveredCustomOrders = customOrders.filter((order) => order.status === custom_order_entity_1.CustomOrderStatus.DELIVERED);
+        const orderRevenue = deliveredOrders.reduce((total, order) => total + Number(order.totalAmount || 0), 0);
+        const customRevenue = deliveredCustomOrders.reduce((total, order) => total + Number(order.price || 0) * Number(order.quantity || 1), 0);
         const totalOrders = orders.length + customOrders.length;
         const activeOrders = orders.filter((order) => ![order_entity_1.OrderStatus.DELIVERED, order_entity_1.OrderStatus.REFUNDED].includes(order.status)).length;
         const activeCustomOrders = customOrders.filter((order) => order.status !== custom_order_entity_1.CustomOrderStatus.DELIVERED).length;
         const revenue = orderRevenue + customRevenue;
         const totalSell = revenue;
-        const totalCost = orders.reduce((total, order) => total + this.getOrderCost(order), 0)
-            + customOrders.reduce((total, order) => total + this.getCustomOrderCost(order), 0);
-        const income = Math.max(totalSell - totalCost, 0);
+        const totalCost = deliveredOrders.reduce((total, order) => total + this.getOrderCost(order), 0)
+            + deliveredCustomOrders.reduce((total, order) => total + this.getCustomOrderCost(order), 0);
+        const income = totalSell - totalCost;
         const currentYear = new Date().getFullYear();
         const monthlyRevenue = Array.from({ length: 12 }, (_, month) => {
-            const regularTotal = paidOrders
+            const regularTotal = deliveredOrders
                 .filter((order) => order.createdAt.getFullYear() === currentYear && order.createdAt.getMonth() === month)
                 .reduce((total, order) => total + Number(order.totalAmount || 0), 0);
-            const customTotal = paidCustomOrders
+            const customTotal = deliveredCustomOrders
                 .filter((order) => order.createdAt.getFullYear() === currentYear && order.createdAt.getMonth() === month)
                 .reduce((total, order) => total + Number(order.price || 0) * Number(order.quantity || 1), 0);
             return { name: new Date(currentYear, month, 1).toLocaleString('en-US', { month: 'short' }), total: Math.round(regularTotal + customTotal) };
@@ -186,7 +188,7 @@ let DashboardService = class DashboardService {
         return {
             totalRevenue: {
                 value: `৳${revenue.toLocaleString()}`,
-                percentageChange: `${paidOrders.length + paidCustomOrders.length} paid orders`,
+                percentageChange: `${deliveredOrders.length + deliveredCustomOrders.length} delivered orders`,
             },
             subscriptions: {
                 value: userCount.toLocaleString(),
