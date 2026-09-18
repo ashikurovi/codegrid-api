@@ -92,10 +92,11 @@ export class CouponsService {
     }
 
     let discount = 0;
+    const maxDiscountNum = Number(coupon.maxDiscount ?? 0);
     if (coupon.discountType === CouponDiscountType.PERCENTAGE) {
       discount = Number(((subtotal * Number(coupon.value)) / 100).toFixed(2));
-      if (coupon.maxDiscount && discount > Number(coupon.maxDiscount)) {
-        discount = Number(coupon.maxDiscount);
+      if (maxDiscountNum > 0 && discount > maxDiscountNum) {
+        discount = maxDiscountNum;
       }
     } else {
       discount = Number(coupon.value);

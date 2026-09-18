@@ -61,7 +61,7 @@ let OrdersService = class OrdersService {
             ...rest,
             user: finalUserId ? { id: finalUserId } : undefined,
             items: orderItems,
-            totalAmount: Number(rest.totalAmount ?? 0) - Number(discountAmount ?? 0),
+            totalAmount: Number(rest.totalAmount ?? 0),
             isPreOrder: Boolean(rest.status === order_entity_1.OrderStatus.PRE_ORDER || createOrderDto.isPreOrder),
             depositAmount: Number(createOrderDto.depositAmount ?? 0),
         });
