@@ -70,7 +70,7 @@ export class BlogsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
     async findOne(@Param('id') id: string) {
-    const data = await this.blogsService.findOne(+id);
+    const data = await this.blogsService.findOne(id);
     return {
       statusCode: HttpStatus.OK,
       message: 'Blog retrieved successfully',

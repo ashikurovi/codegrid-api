@@ -73,7 +73,7 @@ let ProductsController = class ProductsController {
         };
     }
     async findOne(id) {
-        const data = await this.productsService.findOne(+id);
+        const data = await this.productsService.findOne(id);
         return {
             statusCode: common_1.HttpStatus.OK,
             message: 'Product retrieved successfully',

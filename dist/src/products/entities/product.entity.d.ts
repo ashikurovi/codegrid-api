@@ -6,6 +6,7 @@ import { Type } from '../../types/entities/type.entity';
 export declare class Product {
     id: number;
     title: string;
+    sku: string;
     originalPrice: number;
     currentPrice: number;
     stock: number;

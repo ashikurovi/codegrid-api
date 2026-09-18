@@ -30,10 +30,22 @@ let BlogsService = class BlogsService {
             order: { createdAt: 'DESC' },
         });
     }
-    async findOne(id) {
-        const blog = await this.blogRepository.findOne({ where: { id } });
+    async findOne(identifier) {
+        const isNum = !isNaN(Number(identifier)) && /^\d+$/.test(String(identifier).trim());
+        let blog = null;
+        if (isNum) {
+            blog = await this.blogRepository.findOne({ where: { id: Number(identifier) } });
+        }
         if (!blog) {
-            throw new common_1.NotFoundException(`Blog with ID ${id} not found`);
+            const term = String(identifier).trim().toLowerCase();
+            const allBlogs = await this.findAll();
+            blog = allBlogs.find((b) => {
+                const bSlug = (b.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                return bSlug === term || String(b.id) === term;
+            }) || null;
+        }
+        if (!blog) {
+            throw new common_1.NotFoundException(`Blog with ID/Slug '${identifier}' not found`);
         }
         return blog;
     }

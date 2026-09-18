@@ -7,7 +7,7 @@ export declare class BlogsService {
     constructor(blogRepository: Repository<Blog>);
     create(createBlogDto: CreateBlogDto): Promise<Blog>;
     findAll(): Promise<Blog[]>;
-    findOne(id: number): Promise<Blog>;
+    findOne(identifier: string | number): Promise<Blog>;
     update(id: number, updateBlogDto: UpdateBlogDto): Promise<Blog>;
     remove(id: number): Promise<void>;
 }

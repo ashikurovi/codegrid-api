@@ -85,7 +85,7 @@ export class ProductsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
     async findOne(@Param('id') id: string) {
-    const data = await this.productsService.findOne(+id);
+    const data = await this.productsService.findOne(id);
     return {
       statusCode: HttpStatus.OK,
       message: 'Product retrieved successfully',

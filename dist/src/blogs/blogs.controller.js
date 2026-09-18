@@ -67,7 +67,7 @@ let BlogsController = class BlogsController {
         };
     }
     async findOne(id) {
-        const data = await this.blogsService.findOne(+id);
+        const data = await this.blogsService.findOne(id);
         return {
             statusCode: common_1.HttpStatus.OK,
             message: 'Blog retrieved successfully',

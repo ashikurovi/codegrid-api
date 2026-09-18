@@ -23,10 +23,25 @@ export class BlogsService {
     });
   }
 
-  async findOne(id: number): Promise<Blog> {
-    const blog = await this.blogRepository.findOne({ where: { id } });
+  async findOne(identifier: string | number): Promise<Blog> {
+    const isNum = !isNaN(Number(identifier)) && /^\d+$/.test(String(identifier).trim());
+    let blog: Blog | null = null;
+
+    if (isNum) {
+      blog = await this.blogRepository.findOne({ where: { id: Number(identifier) } });
+    }
+
     if (!blog) {
-      throw new NotFoundException(`Blog with ID ${id} not found`);
+      const term = String(identifier).trim().toLowerCase();
+      const allBlogs = await this.findAll();
+      blog = allBlogs.find((b) => {
+        const bSlug = (b.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        return bSlug === term || String(b.id) === term;
+      }) || null;
+    }
+
+    if (!blog) {
+      throw new NotFoundException(`Blog with ID/Slug '${identifier}' not found`);
     }
     return blog;
   }

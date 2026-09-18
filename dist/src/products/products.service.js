@@ -44,6 +44,7 @@ let ProductsService = class ProductsService {
             },
             select: {
                 id: true,
+                sku: true,
                 title: true,
                 originalPrice: true,
                 currentPrice: true,
@@ -58,37 +59,56 @@ let ProductsService = class ProductsService {
             }
         });
     }
-    async findOne(id) {
-        const product = await this.productRepository.findOne({
-            where: { id },
-            relations: {
-                category: true,
-                subCategory: true,
-                brand: true,
-                sizes: true,
-                types: true,
-            },
-            select: {
-                id: true,
-                title: true,
-                originalPrice: true,
-                currentPrice: true,
-                stock: true,
-                variantLabel: true,
-                description: true,
-                additionalInfo: true,
-                features: true,
-                thumbnail: true,
-                images: true,
-                category: { id: true, name: true },
-                subCategory: { id: true, name: true },
-                brand: { id: true, name: true },
-                sizes: { id: true, name: true },
-                types: { id: true, name: true }
-            }
-        });
+    async findOne(identifier) {
+        const isNum = !isNaN(Number(identifier)) && /^\d+$/.test(String(identifier).trim());
+        let product = null;
+        if (isNum) {
+            product = await this.productRepository.findOne({
+                where: { id: Number(identifier) },
+                relations: {
+                    category: true,
+                    subCategory: true,
+                    brand: true,
+                    sizes: true,
+                    types: true,
+                },
+                select: {
+                    id: true,
+                    sku: true,
+                    title: true,
+                    originalPrice: true,
+                    currentPrice: true,
+                    stock: true,
+                    variantLabel: true,
+                    description: true,
+                    additionalInfo: true,
+                    features: true,
+                    thumbnail: true,
+                    images: true,
+                    category: { id: true, name: true },
+                    subCategory: { id: true, name: true },
+                    brand: { id: true, name: true },
+                    sizes: { id: true, name: true },
+                    types: { id: true, name: true }
+                }
+            });
+        }
         if (!product) {
-            throw new common_1.NotFoundException(`Product with ID ${id} not found`);
+            const term = String(identifier).trim().toLowerCase();
+            const allProducts = await this.findAll();
+            const match = allProducts.find((p) => {
+                const pSku = (p.sku || `CG-${p.id}`).toLowerCase();
+                const pSlug = (p.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                return (pSku === term ||
+                    pSlug === term ||
+                    String(p.id) === term);
+            });
+            if (match) {
+                return this.findOne(match.id);
+            }
+        }
+        if (!product) {
+            throw new common_1.NotFoundException(`Product with ID/SKU '${identifier}' not found`);
         }
         return product;
     }

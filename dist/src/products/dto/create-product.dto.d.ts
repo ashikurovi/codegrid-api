@@ -1,5 +1,6 @@
 export declare class CreateProductDto {
     title: string;
+    sku?: string;
     originalPrice: number;
     currentPrice: number;
     variantLabel?: string;

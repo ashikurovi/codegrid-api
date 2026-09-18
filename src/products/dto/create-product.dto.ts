@@ -5,6 +5,10 @@ export class CreateProductDto {
   @IsString()
   title: string;
 
+  @IsString()
+  @IsOptional()
+  sku?: string;
+
   @IsNumber()
   @Type(() => Number)
   originalPrice: number;
